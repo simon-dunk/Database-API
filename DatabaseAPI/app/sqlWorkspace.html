@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/styles.css">
+    <title>SQL Workspace</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .output {
+            background-color: #fff;
+            width: 140px;
+            min-width: 140px;
+            padding: 8px;
+            margin-right: 30px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: width 0.2s ease-in-out; 
+        }
+
+        .main {
+            display: flex;
+        }
+
+        .forExpand {
+            display: flex;
+        }
+
+        .back {
+            max-width: fit-content;
+            max-height: fit-content;
+            font-size: 12px;
+            margin-left: auto;
+            margin-right: 10px;
+            margin-top: auto;
+            margin-bottom: auto;
+            padding: 2px 5px;
+        }
+
+        .sqlTitle {
+            margin-left: 10px;
+        }
+
+        .query {
+            background-color: lightgrey;
+            margin-right: auto;
+            min-width: 320px;
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            padding-top: 8px;
+            padding-left: 8px;
+            padding-right: 5px;
+        }
+
+        .spaceQuery {
+            margin-left: 25px;
+            margin-right: 25px;
+            height: 550px;
+        }
+
+        .queryInput {
+            margin: 8px;
+            background-color: #8e8e8e;
+            height: calc(100% - 59px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            color:#f4f4f4;
+            font-size: larger;
+            outline: none;
+        }
+
+        .queryButtons {
+            display: flex;
+        }
+
+        .queryButton, .decryptQueryButton {
+            display: flex;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 100px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            scale: 1.05;
+        }
+    </style>
+    <script>
+        async function logQueryInput(isDecryptionQuery) {
+            var queryInputText = document.querySelector('.queryInput').innerText;
+            var sanitizedText = queryInputText.replace(/\n/g, ' '); // Replace new lines with spaces
+            let directionRoute = ""
+            
+            if (isDecryptionQuery) {
+                if (sanitizedText.includes("uuid")) {
+                    // sends an Array of Objects
+                    console.log("Sent to Decryption Query Result Page")
+                    window.open("http://localhost:4040/decryption-redirect", "_blank");
+                } else {
+                    window.alert("Your query MUST also Select \"uuid\" from the table to proccess decryption.");
+                }
+            } else {
+                console.log("Sent to Query Result Page")
+                window.open("http://localhost:4040/redirect", "_blank");
+            }      
+            fetch('/receiveQuery', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+                body: JSON.stringify({ query: sanitizedText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response data if needed
+                console.log('Response:', data);
+                // window.open(directionRoute, "_blank");
+            })
+            .catch(error => {
+                // Handle any errors
+                console.error('Error:', error);
+            });
+
+            // window.open(directionRoute, "_blank");
+            console.log("Query Input:", sanitizedText); 
+        }
+
+        function notifyUser() {
+            let confirmed = window.confirm("A decryption query will automatically run decryption on the results of the query. Decryption should only be done on an \"encrypted_phrase\"(s).  It is recommended that you perform a practice query before executing a decryption query. Click \"Cancel\" if you would like to go back to practice your queries. Click \"Ok\" to confirm and execute your query. Would you like to continue?\n\n NOTICE: Your retreived data will open a pop-up menu.")
+            let decryptionQuery = false;
+            if (confirmed) {
+                decryptionQuery = true
+                logQueryInput(decryptionQuery);
+            } else {
+                console.log("User canceled the operation.");
+            }
+            return confirmed;
+        }
+    </script>
+</head>
+<body>
+    
+    <div class="query spaceQuery">
+        <div class="forExpand">
+            <div class="sqlTitle">Enter Your SQL Quries Here</div>
+            <button id="backButton" class="back">back</button>
+        </div>
+        <div class="queryInput" contenteditable="true"></div>
+    </div>
+    <div class="queryButtons">
+        <button class="queryButton" onclick="logQueryInput(false)">Make Query</button>
+        <button class="decryptQueryButton" onclick="notifyUser()">Decryption Query</button>
+    </div>
+</body>
+<script>
+    const backButton = document.getElementById("backButton")
+    backButton.addEventListener('click', function () {
+        window.location.href = "/";
+    });
+    window.addEventListener('beforeunload', function (event) {
+        event.preventDefault();
+    });
+</script>
+</html>
