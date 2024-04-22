@@ -16,6 +16,6 @@
         "node": "^18.20.2"
     },
     "scripts": {
-        "install-packages": "npm install node && npm install nodemon && npm install express && npm install @aws-sdk/client-dynamodb && npm install @aws-sdk/lib-dynamodb && npm install dotenv && npm install uuid && npm install fs"
+        "install-packages": "npm install node && npm install nodemon && npm install express && npm install @aws-sdk/client-dynamodb && npm install @aws-sdk/lib-dynamodb && npm install dotenv && npm install uuid && npm install fs && pip3 install python-dotenv && pip install python-dotenv"
     }
 }

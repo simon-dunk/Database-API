@@ -1,11 +1,12 @@
 <center><h1>Database-API</h1></center>
 
-This project is mainly intended to work in-tandem with a [DynamoDB table](#dynamodb-table) that uses [Vignere Encryption](https://en.wikipedia.org/wiki/Vigenère_cipher) 
-to encrypt 700+ popular phrases from movies. However, some features of this project, like its [SQL interface](DatabaseAPI/app/sqlWorkspace.html), can be used for other use cases. Features include password/key based encryption and decryption. Users can use this feature to encrypt/decrypt specific items from the table using their corresponding uuid as the passwprd. Users can also use this feature to encrypt or decrypt data they input themselves. This project also features a previously mentioned SQL interface where users can query tables from AWS DynamoDB.
+This project is mainly intended to work in-tandem with a [DynamoDB table](#dynamodb-table) that uses [Vignere Encryption](https://en.wikipedia.org/wiki/Vigenère_cipher) to encrypt 700+ popular phrases from movies. However, some features of this project, like its [SQL interface](DatabaseAPI/app/sqlWorkspace.html), can be used for other use cases. Features include password/key based encryption and decryption. Users can use this feature to encrypt/decrypt specific items from the table using their corresponding uuid as the passwprd. Users can also use this feature to encrypt or decrypt data they input themselves. This project also features a previously mentioned SQL interface where users can query tables from AWS DynamoDB.
 
 ## Table of contents 
 ### Sections
 * [Getting Started](#getting-started)
+    * [Create-env-File](#create-env-file)
+    * [Run the project](#run-the-project)
 * [Instructions](#instructions)
     * [Cryptography](#cryptography)
     * [SQL-Queries](#sql-queries)
@@ -34,8 +35,19 @@ to encrypt 700+ popular phrases from movies. However, some features of this proj
 
 # Getting-Started
 ### NOTE 
-If this is your first time running this project, refer to the [Dependencies](#dependencies) section for installation of dependencies.
-### Open the project
+<span style="color: yellow;">If this is your first time running this project</span>, refer to the [Dependencies](#dependencies) section for installation of dependencies. <span style="color: yellow;">ALSO:</span> Follow the instructions in the [next section](#create-env-file) to create the <span style="color: red;">necessary</span> .env file.
+
+### Create-env-File
+Create a file named exactly ".env" in the same folder as [server.js](DatabaseAPI/app/server.js) and [populateDB.py](DatabaseAPI/app/populateDB.py), in this case, that is the [app](DatabaseAPI/app) folder. In the .env file add the code as follows:
+
+        PASSWORD=your_password
+        TABLE=dynamodb_table_name
+
+Replace variable names "your_password" and "dynamodb_table_name" with a custom password and the exact name of your DynamoDB Table respectivly. For more details about this process, see [env-Password-and-Database-Reference](#env-password-and-database-reference).
+
+### Run-The-Project
+After your .env file has been created and configured as directed and all dependencies are installed, you are ready to run the project.
+
 * Navigate to the appropriate folder in the repository using:
 ```bash
 cd DatabaseApi/app
@@ -81,12 +93,12 @@ npm install @aws-sdk/lib-dynamodb
 npm install dotenv
 npm install uuid
 npm install fs
+pip3 install python-dotenv
+pip install python-dotenv
 ```
+NOTE: pip & pip3 are both initially installed to help account for errors based on local machines. Only one is needed. You can uninstall one or the other depending on what works for you.
 
 # Routes-for-localhost-4040
-## parseCSV
-This route parses the .csv data of movie information so that the server can later use it to populate a DynamoDB database.
-
 ## populateDB
 This route populates your DynamoDB database with the movie info that was gathered from [parseCSV](#parsecsv). This route ONLY needs to be called if you are [populating a new database](#populating-a-new-dynamodb-database). It does not need to be called if accessing an existing database with the movie info already added. Calling this route prompts the user for a password. More info on this in the [.env](#env-password-and-database-reference) section.
 <br><span style="color: red;">IMPORTANT:</span> the parseCSV route must be called ONCE before calling the populateDB route.
@@ -107,12 +119,12 @@ This route is called by [normalQueryResults](DatabaseAPI/app/normalQueryResults.
 To populate a new DynamoDB table, you have to first declare the name of your table in your .env file; [more info](#env-password-and-database-reference). Aftert that, you must call the [parseCSV](#parsecsv) route by typing "localhost:4040/parseCSV" into your browser url. Finally call the route [populateDB](#populatedb) by typing "localhost:4040/populateDB" into your browser url. NOTE: This action may take a while, give it some time to process.
 
 # env-Password-and-Database-Reference
-In order to maintain privacy, as well as allow this project to be used by others, this project has been setup to allow others to use personal DynamoDB databases. This is accomplished through the use of a .env file and a password. The [populateDB](#populatedb) route is password protected for the sake of not over-populating a table, and for the sake of not allowing non-authorized people to add data to a DynamoDB table. When "populateDB" is called, the user is taken to a page where they are prompted to enter a password. This password is unique to the local .env file in each individual repository. To have full use of the features in this project, it is <span style="color: red;">REQUIRED</span> that a .env file exists in the same root directory as where the [server.js](DatabaseAPI/app/server.js) and other files are being stored. If you do not have a .env file with the correct configuration, as stated in the next line, some features will not be available. Create a file named ".env". In the .env file, follow this format to declare your <span style="color: yellow;">password</span> and the name of the <span style="color: yellow;">DynamoDB table</span> you want populate.
+In order to maintain privacy, as well as allow this project to be used by others, this project has been setup to allow others to use personal DynamoDB databases. This is accomplished through the use of a .env file and a password. The [populateDB](#populatedb) route is password protected for the sake of not over-populating a table, and for the sake of not allowing non-authorized people to add data to a DynamoDB table. When "populateDB" is called, the user is taken to a page where they are prompted to enter a password. This password is unique to the local .env file in each individual repository. To have full use of the features in this project, it is <span style="color: red;">REQUIRED</span> that a .env file exists in the same root directory as where the [server.js](DatabaseAPI/app/server.js) and other files are being stored. If you do not have a .env file with the correct configuration, as stated in the next line, some features will not be available. Create a file named ".env". In the .env file, follow this format to declare your <span style="color: yellow;">password</span> and the name of the <span style="color: yellow;">DynamoDB table</span> you want populate. Here is an example where the password is "mypassword123" and the DynamoDB table is "myDynamoDBTable":
 
-        PASSWORD=yourPassword
-        TABLE=table_name
+        PASSWORD=mypassword123
+        TABLE=myDynamoDBTable
 
-NOTE: String notation such as single or double quotes is not necessary. However, variables "PASSWORD" and "TABLE" <span style="color: red;">MUST</span> be called exaclt as such and remain in all caps.
+NOTE: String notation such as single or double quotes is not necessary. However, name of the variables "PASSWORD" and "TABLE" <span style="color: red;">MUST</span> be exaclt as such and remain in all caps.
 
 
 # DynamoDB-Table-Schema
