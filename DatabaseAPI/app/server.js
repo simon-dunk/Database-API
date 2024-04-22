@@ -47,14 +47,20 @@ async function populateDB() {
               Item: item
           });
           await docClient.send(putCommand);
-          serverLog("Item added");
       }
-      return `${nItems} [ALL] Items Added`;
+      serverLog(`${nItems} Item(s) added`);
+
+      const result = { status: "Success" };
+      return result;
+
   } catch (error) {
       errorLog(error.message);
-      throw error;
+
+      const result = { status: "Failure" };
+      return result; 
   }
 }
+
 
 const personalPassword = process.env.PASSWORD;
 app.get("/populateDB", function(req, res) {
@@ -62,41 +68,25 @@ app.get("/populateDB", function(req, res) {
 });
 
 app.post("/populateDB", function(req, res) {
+  movieData = readLocalCSV("movie_quotes.csv")
   const password = req.body.password;
-  let html;
+  let returnVal = {status: "Function Did Not Return Expected Value"}
 
   if (password == personalPassword) {
     // If the password is correct, perform the database population
     varification("Correct Password");
+
     populateDB().then(function(returnVal) {
       serverLog("Returned ID " + returnVal);
-      html += "<p>UPDATED : " + returnVal + "</p>";
     });
+    console.log(movieData)
   } else {
-    html = "<h1>Incorrect Password</h1>";
     varification(`Incorrect Password "${password}"`)
+    returnVal = {status: "Incorrect Password"}
   }
   
-  res.send(html);
+  res.json(returnVal);
 });
-
-// app.get("/populateDB", function(req, res) {
-//   const password = prompt("Enter Password:")
-//   let html;
-//   if (password == hardCodePassword) {
-//     html = "<h1>Updated DB</h1>"
-//     // populateDB().then(function(returnVal) {
-//     //   serverLog("Returned ID " + returnVal);
-//     //   html += "<p>UPDATED : " + returnVal + "</p>";
-//     //   // send() method returns HTML to the caller / client 
-//     //   res.send(html);
-//     // });
-//     res.send(html);
-//   } else {
-//     html = "<h1>Incorrect Password</h1>"
-//     res.send(html);
-//   }
-// });
 
 // Used for development
 app.get("/getData", async function(req, res) {
@@ -121,20 +111,6 @@ app.get("/getData", async function(req, res) {
       res.status(500).json({ error: 'Internal Server Error' }); // Respond with an error status and message
   }
 });
-
-// Only used for setup
-app.get("/parseCSV", async function(req, res) {
-  movieData = readLocalCSV("movie_quotes.csv")
-  let html = "<h1>.csv File Read</h1>";
-  res.send(html)
-});
-
-// // Testing. Reliant on /parseCSV called first.
-// app.get("/test", async function(req, res) {
-//   let html = "<h1>Tested</h1>";
-//   serverLog(movieData[2])
-//   res.send(html)
-// });
 
 
 app.get("/getQueryData", (req, res) => {
@@ -317,17 +293,17 @@ function decryptVigenere(key, cipherText) {
 
 function readLocalCSV(filePath) {
   try {
-      // Read the CSV file synchronously
+      // Read the .CSV file
       const csvText = fs.readFileSync(filePath, 'utf-8');
       
-      // Parse the CSV text
+      // Parse the .CSV file
       const rows = csvText.split('\n').map(row => row.split(','));
       
-      // Return the parsed CSV data
+      // Return parsed .CSV data
       return rows;
   } catch (error) {
       errorLog(error.message);
-      return null;
+      return error.message;
   }
 }
 
