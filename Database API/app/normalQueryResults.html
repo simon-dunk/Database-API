@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Query Results</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            const queryResults = document.getElementById("queryResults")
+
+            console.log("connected...")
+            const response = await fetch("http://localhost:4040/getQueryData", {
+                method: "GET"
+            });
+            console.log("Response received")
+            const jsonData = await response.json();
+
+            let htmlString = ``;
+
+            for (let i = 0; i < jsonData.length; i++) {
+                htmlString += `<h3>${jsonData[i]}</h3>`
+            }
+            await pauseForOneSecond();
+            queryResults.innerHTML = `<h1>Results</h1>`;
+            queryResults.innerHTML += htmlString;
+            checkLoad()
+        });
+
+        function checkLoad() {
+            if (!sessionStorage.getItem('reloaded')) {
+                // Mark that the page has been reloaded
+                sessionStorage.setItem('reloaded', 'true');
+                // Reload the page
+                window.location.reload();
+            }
+        }
+
+        function pauseForOneSecond() {
+            return new Promise(resolve => {
+                setTimeout(resolve, 1000); // 1000 milliseconds = 1 second
+            });
+        }
+
+
+    </script>
+</head>
+<body>
+    <div id="queryResults">
+        <h1>Loading . . .</h1>
+    </div>
+</body>
+</html>

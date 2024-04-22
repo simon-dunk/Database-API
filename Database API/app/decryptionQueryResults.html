@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Query Results</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            await parseEncryptions();
+            // window.location.reload();
+            
+        });
+
+        async function parseEncryptions() {
+            const response = await fetch("http://localhost:4040/getQueryData", {
+                method: "GET"
+            });
+            console.log("Response received")
+            const jsonData = await response.json();
+
+            console.log(jsonData)
+
+            const jsonArray = [];
+            jsonData.forEach(jsonString => {
+                const jsonObject = JSON.parse(jsonString);
+                jsonArray.push(jsonObject);
+            });
+
+            const resultDiv = document.getElementById("queryResults")
+            let htmlString = ``;
+
+            for (let i = 0; i < jsonArray.length; i++) {
+                const JSONuuid = JSON.stringify(jsonArray[i]["uuid"]);
+                const JSONphrase = JSON.stringify(jsonArray[i]["encrypted_phrase"]);
+                const uuid = JSON.parse(JSONuuid);
+                const phrase = JSON.parse(JSONphrase);
+                const password = gen_key_from_pass(uuid)
+                htmlString += `<h3>${decryptVigenere(password, phrase)}</h3>`
+                htmlString += `<button class="JSONDisplayButon" id="${i}" onclick="toggleJSONDisplay(${i})">Show JSON</button>`
+                htmlString += `<div class="JSONDisplay" id="JSON${i}" style="display: none;">${jsonData[i]}</div>`
+            }
+
+            await pauseForOneSecond();
+            resultDiv.innerHTML = `<h1>Results</h1>`;
+            resultDiv.innerHTML += htmlString;
+            checkLoad()
+        }
+
+        function checkLoad() {
+            if (!sessionStorage.getItem('reloaded')) {
+                // Mark that the page has been reloaded
+                sessionStorage.setItem('reloaded', 'true');
+                // Reload the page
+                window.location.reload();
+            }
+        }
+
+        function pauseForOneSecond() {
+            return new Promise(resolve => {
+                setTimeout(resolve, 1000); // 1000 milliseconds = 1 second
+            });
+        }
+
+        function toggleJSONDisplay(idx) {
+            const JSONDisplay = document.getElementById(`JSON${idx}`);
+            if (JSONDisplay.style.display === "none") {
+                JSONDisplay.style.display = "block";
+            } else {
+                JSONDisplay.style.display = "none";
+            }
+        }
+
+        function letterToIndex(letter) {
+            let idx = 0;
+            if (letter.charCodeAt(0) == 45) {
+                idx = letter.charCodeAt(0) - 18
+
+            } else if (letter.charCodeAt(0) >= 48 && letter.charCodeAt(0) <= 57) {
+                idx = letter.charCodeAt(0) - 21;
+            } else if (letter.charCodeAt(0) <= 122 && letter.charCodeAt(0) >= 97) {
+                idx = letter.charCodeAt(0) - 97;
+
+            } else if (letter.charCodeAt(0) <= 90 && letter.charCodeAt(0) >= 65) {
+                idx = letter.charCodeAt(0) - 65;
+
+            }
+            return idx;
+        }
+
+        function indexToLetter(idx) {
+            idx = idx + 97;
+            return String.fromCharCode(idx);
+        }
+
+        function vigenereIndex(keyLetter, plainTextLetter) {
+            const keyIndex = letterToIndex(keyLetter);
+            const plainTextIndex = letterToIndex(plainTextLetter);
+            const newIndex = (plainTextIndex + keyIndex) % 26;
+            const index = indexToLetter(newIndex);
+            return index;
+        }
+
+        function undoVig(keyLetter, cipherTextLetter) {
+            const keyIndex = letterToIndex(keyLetter);
+            const cipherTextIndex = letterToIndex(cipherTextLetter);
+            const newIndex = (cipherTextIndex - keyIndex + 26) % 26;
+            const index = indexToLetter(newIndex);
+            return index;
+        }
+
+        function removeDuplicates(myString) {
+            let newStr = "";
+            for (let ch of myString) {
+                if (!newStr.includes(ch)) {
+                    newStr += ch;
+                }
+            }
+            return newStr;
+        }
+
+        function removeMatches(myString, remove) {
+            let newStr = "";
+            for (let ch of myString) {
+                if (!remove.includes(ch)) {
+                    newStr += ch;
+                }
+            }
+            return newStr;
+        }
+
+        function gen_key_from_pass(newPassword) {
+            let password = newPassword.replace(/[-0-9]/g, "");
+            const alphabet = 'abcdefghijklmnopqrstuvwxyz ';
+            let key = "";
+            password = password.toLowerCase();
+            password = removeDuplicates(password);
+            const lastChar = password.slice(-1);
+            const lastIdx = alphabet.indexOf(lastChar);
+            const afterString = removeMatches(alphabet.slice(lastIdx + 1), password);
+            const beforeString = removeMatches(alphabet.slice(0, lastIdx), password);
+            key = password + afterString + beforeString;
+            // console.log(key)
+            return key;
+        }
+
+        function encryptVigenere(key, plainText) {
+            plainText = plainText.replace(/[^\w\s]/g, "");
+            let cipherText = "";
+            const keyLen = key.length;
+            for (let i = 0; i < plainText.length; i++) {
+                let ch = plainText[i].toLowerCase();
+                if (ch === " ") {
+                    cipherText += ch;
+                } else {
+                    cipherText += vigenereIndex(key[i % keyLen], ch);
+                }
+            }
+            return cipherText;
+        }
+
+        function decryptVigenere(key, cipherText) {
+            // console.log("TEST")
+            // console.log(cipherText)
+            // console.log("TEST")
+            let plainText = "";
+            const keyLen = key.length;
+            for (let i = 0; i < cipherText.length; i++) {
+                let ch = cipherText[i];
+                if (ch === " ") {
+                    plainText += ch;
+                } else {
+                    plainText += undoVig(key[i % keyLen], ch);
+                }
+            }
+            return plainText;
+        }
+        
+    </script>
+</head>
+<body>
+    <div id="queryResults"><h1>Loading . . .</h1></div>
+</body>
+</html>
