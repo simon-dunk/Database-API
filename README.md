@@ -68,7 +68,7 @@ NOTE: The databases the user is able to query is related to each user's individu
 # Dependencies
 ### To install all packages needed for this project, run this command in the terminal:
 ```bash
-npm install-packages
+npm run install-packages
 ```
 ### Note:
 This command will install all of the following listed packages. If "npm install-packages" does not work, you can copy all the following installation commands to install the packages individually.

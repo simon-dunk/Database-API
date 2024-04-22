@@ -8,5 +8,8 @@
     "node": "^18.20.2",
     "nodemon": "^3.1.0",
     "uuid": "^9.0.1"
+  },
+  "scripts": {
+    "install-packages": "npm install node && npm install nodemon && npm install express && npm install @aws-sdk/client-dynamodb && npm install @aws-sdk/lib-dynamodb && npm install dotenv && npm install uuid && npm install fs"
   }
 }
