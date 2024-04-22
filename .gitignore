@@ -3,3 +3,4 @@ node_modules
 settings.json
 .env
 package-lock.json
+DatabaseAPI/app/package-lock.json
