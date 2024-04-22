@@ -3,6 +3,8 @@ const clientDynamoLib = require("@aws-sdk/lib-dynamodb");
 const express = require("express")
 const uuid = require("uuid")
 const app = express() // ALWAYS
+const dotenv = require('dotenv').config();
+
 const fs = require("fs")
 
 const client = new clientDynamoDB.DynamoDBClient({});
@@ -10,13 +12,14 @@ const docClient = clientDynamoLib.DynamoDBDocumentClient.from(client);
 const errorLog = (errorMsg) => console.error(`[ERROR] ${errorMsg}`);
 const serverLog = (serverMsg) => console.log(`[SERVER] ${serverMsg}`);
 const DBLog = (DBMsg) => console.log(`[DB] ${DBMsg}`);
+const varification = (varMsg) => console.log(`[Varification] ${varMsg}`);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 let movieData = null;
 let queryData = []
-let table = "Midterm_Simon"
+const table = process.env.TABLE;
 
 
 
@@ -37,8 +40,6 @@ async function populateDB() {
       date: getDate()
     });
   }
-
-
   try {
       for (const item of items) {
           const putCommand = new clientDynamoLib.PutCommand({
@@ -55,16 +56,47 @@ async function populateDB() {
   }
 }
 
-
+const personalPassword = process.env.PASSWORD;
 app.get("/populateDB", function(req, res) {
-  let html = "<h1>Updated DB</h1>"
-  populateDB().then(function(returnVal) {
-    serverLog("Returned ID " + returnVal);
-    html += "<p>UPDATED : " + returnVal + "</p>";
-    // send() method returns HTML to the caller / client 
-    res.send(html);
-  });
+  res.sendFile(__dirname + "/passwordForm.html");
 });
+
+app.post("/populateDB", function(req, res) {
+  const password = req.body.password;
+  let html;
+
+  if (password == personalPassword) {
+    // If the password is correct, perform the database population
+    varification("Correct Password");
+    populateDB().then(function(returnVal) {
+      serverLog("Returned ID " + returnVal);
+      html += "<p>UPDATED : " + returnVal + "</p>";
+    });
+  } else {
+    html = "<h1>Incorrect Password</h1>";
+    varification(`Incorrect Password "${password}"`)
+  }
+  
+  res.send(html);
+});
+
+// app.get("/populateDB", function(req, res) {
+//   const password = prompt("Enter Password:")
+//   let html;
+//   if (password == hardCodePassword) {
+//     html = "<h1>Updated DB</h1>"
+//     // populateDB().then(function(returnVal) {
+//     //   serverLog("Returned ID " + returnVal);
+//     //   html += "<p>UPDATED : " + returnVal + "</p>";
+//     //   // send() method returns HTML to the caller / client 
+//     //   res.send(html);
+//     // });
+//     res.send(html);
+//   } else {
+//     html = "<h1>Incorrect Password</h1>"
+//     res.send(html);
+//   }
+// });
 
 // Used for development
 app.get("/getData", async function(req, res) {
@@ -91,11 +123,11 @@ app.get("/getData", async function(req, res) {
 });
 
 // Only used for setup
-// app.get("/parseCSV", async function(req, res) {
-//   movieData = readLocalCSV("../../movie_quotes.csv")
-//   let html = "<h1>.csv File Read</h1>";
-//   res.send(html)
-// });
+app.get("/parseCSV", async function(req, res) {
+  movieData = readLocalCSV("movie_quotes.csv")
+  let html = "<h1>.csv File Read</h1>";
+  res.send(html)
+});
 
 // // Testing. Reliant on /parseCSV called first.
 // app.get("/test", async function(req, res) {
@@ -117,15 +149,6 @@ app.post("/receiveQuery", async (req, res) => {
     errorLog(error.message);
     res.status(500).json({ error: 'Internal Server Error' });
   }
-});
-
-app.post("/updateTableReference", async (req, res) => {
-  const tableReference = {
-    new_table: req.body.new_table_reference
-  };
-  table = tableReference["new_table"]
-  serverLog(table)
-  res.json(tableReference)
 });
 
 
