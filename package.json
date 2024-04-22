@@ -10,7 +10,7 @@
     "uuid": "^9.0.1"
   },
   "scripts": {
-    "install-packages": "npm run --silent logNode && npm install node && npm run --silent logNodemon && npm install nodemon && npm run --silent logExpress && npm install express && npm run --silent logAwsClientDB && npm install @aws-sdk/client-dynamodb && npm run --silent logAwsLibDB && npm install @aws-sdk/lib-dynamodb && npm run --silent logDotenv && npm install dotenv && npm run --silent logUuid && npm install uuid && npm run --silent logFs && npm install fs && npm run --silent logPy3Dotenv && pip3 install python-dotenv && npm run --silent logPyDotenv && pip install python-dotenv",
+    "install-packages": "npm run --silent logNode && npm install node && npm run --silent logNodemon && npm install nodemon && npm run --silent logExpress && npm install express && npm run --silent logAwsClientDB && npm install @aws-sdk/client-dynamodb && npm run --silent logAwsLibDB && npm install @aws-sdk/lib-dynamodb && npm run --silent logDotenv && npm install dotenv && npm run --silent logUuid && npm install uuid && npm run --silent logFs && npm install fs && npm run --silent logPyDotenv && pip install python-dotenv && npm run --silent logPy3Dotenv && pip3 install python-dotenv",
     "logNode": "echo [TERMINAL] Installing node",
     "logNodemon": "echo [TERMINAL] Installing nodemon",
     "logExpress": "echo [TERMINAL] Installing express",
