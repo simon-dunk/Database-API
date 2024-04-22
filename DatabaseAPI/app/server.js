@@ -61,12 +61,6 @@ async function populateDB() {
   }
 }
 
-app.post("/testDB", function(req, res) {
-  console.log("/updateDB with " + req.body)
-  returnVal = req.body
-    // send() method returns HTML to the caller / client 
-    res.json(returnVal);
-});
 
 const personalPassword = process.env.PASSWORD;
 app.get("/populateDB", function(req, res) {
@@ -82,9 +76,9 @@ app.post("/populateDB", function(req, res) {
     // If the password is correct, perform the database population
     varification("Correct Password");
 
-    // populateDB().then(function(returnVal) {
-    //   serverLog("Returned ID " + returnVal);
-    // });
+    populateDB().then(function(returnVal) {
+      serverLog("Returned ID " + returnVal);
+    });
     console.log(movieData)
   } else {
     varification(`Incorrect Password "${password}"`)
@@ -93,24 +87,6 @@ app.post("/populateDB", function(req, res) {
   
   res.json(returnVal);
 });
-
-// app.get("/populateDB", function(req, res) {
-//   const password = prompt("Enter Password:")
-//   let html;
-//   if (password == hardCodePassword) {
-//     html = "<h1>Updated DB</h1>"
-//     // populateDB().then(function(returnVal) {
-//     //   serverLog("Returned ID " + returnVal);
-//     //   html += "<p>UPDATED : " + returnVal + "</p>";
-//     //   // send() method returns HTML to the caller / client 
-//     //   res.send(html);
-//     // });
-//     res.send(html);
-//   } else {
-//     html = "<h1>Incorrect Password</h1>"
-//     res.send(html);
-//   }
-// });
 
 // Used for development
 app.get("/getData", async function(req, res) {
@@ -317,13 +293,13 @@ function decryptVigenere(key, cipherText) {
 
 function readLocalCSV(filePath) {
   try {
-      // Read the CSV file synchronously
+      // Read the .CSV file
       const csvText = fs.readFileSync(filePath, 'utf-8');
       
-      // Parse the CSV text
+      // Parse the .CSV file
       const rows = csvText.split('\n').map(row => row.split(','));
       
-      // Return the parsed CSV data
+      // Return parsed .CSV data
       return rows;
   } catch (error) {
       errorLog(error.message);
