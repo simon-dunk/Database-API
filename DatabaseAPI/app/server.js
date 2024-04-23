@@ -4,6 +4,9 @@ const express = require("express")
 const uuid = require("uuid")
 const app = express() // ALWAYS
 const dotenv = require('dotenv').config();
+let bodyParser = require("body-parser")
+
+app.use(bodyParser.json());
 
 const fs = require("fs")
 
@@ -15,7 +18,7 @@ const DBLog = (DBMsg) => console.log(`[DB] ${DBMsg}`);
 const varification = (varMsg) => console.log(`[Varification] ${varMsg}`);
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+// app.use(express.json());
 
 let movieData = null;
 let queryData = []
@@ -27,7 +30,8 @@ async function populateDB() {
   const items = [];
   let nItems = 0
 
-  for (let i = 1; i < movieData.length; i++) {
+  for (let i = 1; i < 3; i++) {
+  // for (let i = 1; i < movieData.length; i++) {
     const itemID = uuid.v4();
     const movieInfo_JSON = { movie: movieData[i][1], year: movieData[i][3] };
     serverLog(itemID)
@@ -70,22 +74,20 @@ app.get("/populateDB", function(req, res) {
 app.post("/populateDB", function(req, res) {
   movieData = readLocalCSV("movie_quotes.csv")
   const password = req.body.password;
-  let returnVal = {status: "Function Did Not Return Expected Value"}
 
   if (password == personalPassword) {
     // If the password is correct, perform the database population
     varification("Correct Password");
 
     populateDB().then(function(returnVal) {
-      serverLog("Returned ID " + returnVal);
+      serverLog("Returned Status " + returnVal["status"]);
     });
     console.log(movieData)
+    res.json({status: "Success"});
   } else {
     varification(`Incorrect Password "${password}"`)
-    returnVal = {status: "Incorrect Password"}
+    res.json({status: "Failure or Incorrect Password"});
   }
-  
-  res.json(returnVal);
 });
 
 // Used for development
@@ -120,7 +122,6 @@ app.get("/getQueryData", (req, res) => {
 app.post("/receiveQuery", async (req, res) => {
   try {
     query(req.body);
-    // Don't send a response here
   } catch (error) {
     errorLog(error.message);
     res.status(500).json({ error: 'Internal Server Error' });

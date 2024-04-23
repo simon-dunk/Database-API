@@ -2,6 +2,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.556.0",
     "@aws-sdk/lib-dynamodb": "^3.556.0",
+    "body-parser": "^1.20.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "fs": "^0.0.1-security",
@@ -10,16 +11,20 @@
     "uuid": "^9.0.1"
   },
   "scripts": {
-    "install-packages": "npm run --silent logNode && npm install node && npm run --silent logNodemon && npm install nodemon && npm run --silent logExpress && npm install express && npm run --silent logAwsClientDB && npm install @aws-sdk/client-dynamodb && npm run --silent logAwsLibDB && npm install @aws-sdk/lib-dynamodb && npm run --silent logDotenv && npm install dotenv && npm run --silent logUuid && npm install uuid && npm run --silent logFs && npm install fs && npm run --silent logPyDotenv && pip install python-dotenv && npm run --silent logPy3Dotenv && pip3 install python-dotenv",
-    "logNode": "echo [TERMINAL] Installing node",
-    "logNodemon": "echo [TERMINAL] Installing nodemon",
-    "logExpress": "echo [TERMINAL] Installing express",
-    "logAwsClientDB": "echo [TERMINAL] Installing @aws-sdk/client-dynamodb",
-    "logAwsLibDB": "echo [TERMINAL] Installing @aws-sdk/lib-dynamodb",
-    "logDotenv": "echo [TERMINAL] Installing dotenv",
-    "logUuid": "echo [TERMINAL] Installing uuid",
-    "logFs": "echo [TERMINAL] Installing fs",
-    "logPyDotenv": "echo [TERMINAL] Installing python-dotenv with pip",
-    "logPy3Dotenv": "echo [TERMINAL] Installing python-dotenv with pip3"
+    "install-packages": "npm run --silent logNode && npm install node && npm run --silent logNodemon && npm install nodemon && npm run --silent logExpress && npm install express && npm run --silent logAwsClientDB && npm install @aws-sdk/client-dynamodb && npm run --silent logAwsLibDB && npm install @aws-sdk/lib-dynamodb && npm run --silent logDotenv && npm install dotenv && npm run --silent logUuid && npm install uuid && npm run --silent logFs && npm install fs && npm run --silent logBodyParser && npm install body-parser && npm run --silent logPyDotenv && pip install python-dotenv && npm run --silent logPy3Dotenv && pip3 install python-dotenv",
+    "listPackages": "npm run --silent npmLog && npm list && npm run --silent pipLog && pip list",
+    "npmLog": "echo [npm] Installed Packages:",
+    "pipLog": "echo [pip] Installed Packages:",
+    "logNode": "echo [npm] Installing node",
+    "logNodemon": "echo [npm] Installing nodemon",
+    "logExpress": "echo [npm] Installing express",
+    "logAwsClientDB": "echo [npm] Installing @aws-sdk/client-dynamodb",
+    "logAwsLibDB": "echo [npm] Installing @aws-sdk/lib-dynamodb",
+    "logDotenv": "echo [npm] Installing dotenv",
+    "logUuid": "echo [npm] Installing uuid",
+    "logFs": "echo [npm] Installing fs",
+    "logBodyParser": "echo [npm] Installing body-parser",
+    "logPyDotenv": "echo [pip] Installing python-dotenv with pip",
+    "logPy3Dotenv": "echo [pip3] Installing python-dotenv with pip3"
   }
 }
